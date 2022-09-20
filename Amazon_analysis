@@ -1,0 +1,24 @@
+import pandas as pd
+
+
+df = pd.read_csv(r'C:\Users\admin\Desktop\Udemy\Consumer_Reviews_Amazon.csv', index_col = 0)
+df.columns = [col.replace(".", "_") for col in df.columns]
+df2 = df[["name", 'primaryCategories', 'reviews_rating', 'reviews_text']]
+df2.columns = ['name', '1st_cat', 'ratting', 'text']
+df2.to_csv(r'C:\Users\admin\Desktop\Udemy\amazon_analysis_clean.csv')
+
+cat = df2["1st_cat"].value_counts().plot(kind="pie")
+
+rating = df2["ratting"].value_counts().sort_index().\
+         plot(kind="bar", legend = True, title = "Freq - Częstotliwosc")
+
+
+st_ans = df2.groupby("name").count()["ratting"].rename("count").\
+         nlargest(3).plot(kind="bar")
+
+
+ax = df2.groupby("name").agg("mean").rename(columns = {"ratting": "mean_ratting"}).\
+     nlargest(3, columns = "mean_ratting")
+     
+ay = df2.groupby("name").agg("mean").rename(columns = {"ratting": "mean_ratting"}).\
+     nsmallest(3, columns = "mean_ratting")  
