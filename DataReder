@@ -1,0 +1,28 @@
+import pandas as p
+from pandas_datareader.data import DataReader
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+
+# %%
+amazon = DataReader("AMZN", "stooq")
+amazon.to_csv("data.csv")
+
+# %%
+amazon["Close"].plot()
+amazon["Close"].plot(alpha = 0.5)
+
+# %%
+amazon.resample("BQ").mean()["Close"].plot(color = "purple", style = "--",
+                                           alpha = 0.6)
+plt.legend(['price', 'quarter average'])
+
+# %%
+fig, ax  = plt.subplots(3, sharex = True)
+amazon["Close"].plot(ax=ax[0])
+amazon["Close"].shift(365).plot(ax=ax[1])
+amazon["Close"].shift(-365).plot(ax=ax[2])
+
+ax[0].legend(['input'])
+ax[1].legend(['shift by 365'])
+ax[2].legend(['shift by -365'])
