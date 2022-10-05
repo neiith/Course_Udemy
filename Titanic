@@ -1,0 +1,49 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set()
+
+# %%loading dataset
+tit = sns.load_dataset("titanic")
+
+# %% grouping by sex and ploting
+#tit.groupby("sex").size().plot(kind = "bar", alpha = 0.5)
+#tit.groupby(["sex", "survived"]).size().plot(kind = "bar", alpha = 0.5)
+list_col = []
+for col in tit.columns: 
+    list_col.append(col)
+
+# %%grouping by class 
+#tit.groupby("class").size().plot(kind = "bar", alpha = 0.5)
+tit.groupby("class").mean()['survived'].plot(kind = 'bar')
+
+r = pd.pivot_table(data = tit, values = "survived", index = "sex",
+               columns = "class", aggfunc = "count")
+
+#%% making variable age categorical and grouping by age
+tit['age_bins'] = pd.cut(x = tit['age'], bins = [0, 18, 80])
+pv = pd.pivot_table(data = tit, values = "survived", index = 'age_bins',
+               columns = 'class', aggfunc = 'count')
+
+# %% making subplots
+fig, ax = plt.subplots(1, 2, sharey = True)
+tit.groupby(['sex', 'survived']).size()['male'].plot(ax = ax[0], kind = 'bar',
+                                                     title = 'Survived_male')
+tit.groupby(['sex', 'survived']).size()['female'].plot(ax = ax[1], kind = 'bar',
+                                                       title = "Survived_female")
+
+#alternative 
+#ax[0].legend('male')
+#ax[1].legend('female')
+
+# %% pivoting table 
+r1 = pd.pivot_table(data = tit, values = "age", index = "survived",
+               columns = "sex", aggfunc = "count")
+r1.plot(subplots = True, kind = 'bar', sharey = True, layout = (1,2))
+
+# %%
+x = pd.pivot_table(data = tit, index = 'sex', columns = 'class',
+               aggfunc = {'survived': sum, 
+                          'fare': 'mean',
+                          'age': 'mean'})
